@@ -17,7 +17,7 @@
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/YOUR_USERNAME/mielofon.git
+git clone https://github.com/kringova/mielofon.git
 cd mielofon
 
 # Установка зависимостей
@@ -29,7 +29,7 @@ npm start
 
 ## Демо
 
-Демо-версия доступна по адресу: [https://YOUR_USERNAME.github.io/mielofon](https://YOUR_USERNAME.github.io/mielofon)
+Демо-версия доступна по адресу: [https://kringova.github.io/mielofon](https://kringova.github.io/mielofon)
 
 ## Технологии
 
