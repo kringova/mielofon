@@ -1,24 +1,35 @@
 import React from 'react';
-import { Navbar, Container } from 'react-bootstrap';
+import { Navbar, Container, Button } from 'react-bootstrap';
 
 function Header({ resetFlow }) {
   return (
-    <Navbar bg="dark" variant="dark" expand="lg">
+    <header className="crystal-header">
       <Container>
-        <Navbar.Brand 
-          href="#" 
-          onClick={(e) => {
-            e.preventDefault();
-            resetFlow();
-          }}
-          style={{ cursor: 'pointer' }}
-        >
-          <span className="me-2">💡</span>
-          Миелофон
-        </Navbar.Brand>
-        <span className="text-light">AI-система для управления знаниями компании</span>
+        <Navbar expand="lg">
+          <Navbar.Brand href="#home">
+            <span className="material-icons brand-icon">podcasts</span>
+            Миелофон
+          </Navbar.Brand>
+          <div className="ms-auto">
+            <Button 
+              variant="outline-primary" 
+              size="sm"
+              onClick={resetFlow}
+            >
+              <span className="material-icons">refresh</span>
+              Сбросить
+            </Button>
+          </div>
+        </Navbar>
+        
+        <div className="text-center mt-4 mb-3 text-white">
+          <h1 className="display-5 mb-2">Миелофон</h1>
+          <p className="lead">
+            Мысли → Документация → Знания
+          </p>
+        </div>
       </Container>
-    </Navbar>
+    </header>
   );
 }
 

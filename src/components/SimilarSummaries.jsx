@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, ListGroup, Badge, Button, Modal, Form } from 'react-bootstrap';
 import { Row, Col } from 'react-bootstrap';
 
-function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generateRfc }) {
+function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generateRfc, onGenerateRfc }) {
   const [showModal, setShowModal] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState(null);
   const [messageText, setMessageText] = useState('');
@@ -40,32 +40,49 @@ function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generat
   }
 
   return (
-    <Card className="mb-4">
+    <Card className="crystal-card">
+      <Card.Header>
+        <div className="d-flex align-items-center">
+          <span className="material-icons me-2" style={{ color: 'var(--primary-crystal)', fontSize: '24px' }}>
+            find_in_page
+          </span>
+          <div>
+            <Card.Title className="mb-0">Похожие встречи</Card.Title>
+            <Card.Subtitle className="mt-1">
+              Найдено {summaries.length} похожих обсуждений
+            </Card.Subtitle>
+          </div>
+        </div>
+      </Card.Header>
       <Card.Body>
-        <Card.Title>Похожие встречи</Card.Title>
-        <Card.Subtitle className="mb-4 text-muted">
-          Найдено {summaries.length} похожих обсуждений
-        </Card.Subtitle>
-        
         {summaries.map(summary => (
-          <Card key={summary.id} className="mb-3">
+          <Card key={summary.id} className="mb-3 summary-card">
             <Card.Body>
               <Row>
                 <Col md={8}>
                   <Card.Title>{summary.title}</Card.Title>
                   <Card.Text>{summary.content}</Card.Text>
                   <div className="mb-2">
-                    <small className="text-muted">
-                      Участники: {summary.participants.join(', ')}
+                    <small className="text-muted d-flex align-items-center">
+                      <span className="material-icons me-1" style={{ fontSize: '16px' }}>
+                        people
+                      </span>
+                      {summary.participants.join(', ')}
                     </small>
                   </div>
                 </Col>
                 <Col md={4} className="d-flex flex-column justify-content-between">
                   <div>
-                    <div className="mb-2">
-                      <Badge bg="info">Схожесть: {(summary.similarity * 100).toFixed(0)}%</Badge>
+                    <div className="crystal-badge mb-2">
+                      <span className="material-icons" style={{ fontSize: '14px' }}>
+                        percent
+                      </span>
+                      Схожесть: {(summary.similarity * 100).toFixed(0)}%
                     </div>
-                    <div className="mb-3">
+                    <div className="similarity-indicator">
+                      <div className="bar" style={{ width: `${(summary.similarity * 100).toFixed(0)}%` }}></div>
+                    </div>
+                    <div className="mb-3 mt-3">
                       <strong>Команда:</strong> {summary.team}
                     </div>
                     <div className="mb-3">
@@ -73,10 +90,14 @@ function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generat
                     </div>
                   </div>
                   <Button 
-                    variant="outline-dark" 
+                    variant="outline-primary" 
                     size="sm"
-                    onClick={() => window.open(`mailto:${summary.contact}?subject=По поводу встречи "${summary.title}"`, '_blank')}
+                    onClick={() => handleConnect(summary)}
+                    className="d-flex align-items-center justify-content-center"
                   >
+                    <span className="material-icons me-1" style={{ fontSize: '16px' }}>
+                      mail
+                    </span>
                     Связаться с командой
                   </Button>
                 </Col>
@@ -85,16 +106,32 @@ function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generat
           </Card>
         ))}
         
-        <div className="mt-4 text-center">
+        <div className="mt-4 d-flex justify-content-center gap-3">
+          {!generateRfc && (
+            <Button 
+              variant="primary" 
+              size="lg"
+              onClick={onGenerateRfc}
+              className="px-4 py-3 d-flex align-items-center"
+            >
+              <span className="material-icons me-2">description</span>
+              <span>Сгенерировать RFC</span>
+            </Button>
+          )}
+          
           {!generateRfc || (generateRfc && showRfc) ? (
             <Button 
               variant="dark" 
+              size="lg"
               onClick={onGenerateDocumentation}
+              className="px-4 py-3 d-flex align-items-center"
             >
-              Перейти к генерации документации
+              <span className="material-icons me-2">article</span>
+              <span>Перейти к генерации документации</span>
             </Button>
           ) : (
-            <div className="text-muted">
+            <div className="text-muted d-flex align-items-center">
+              <div className="crystal-spinner me-2" style={{ width: '20px', height: '20px' }}></div>
               Ожидание генерации RFC...
             </div>
           )}
@@ -103,12 +140,19 @@ function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generat
       
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Связаться с участниками</Modal.Title>
+          <Modal.Title className="d-flex align-items-center">
+            <span className="material-icons me-2">mail</span>
+            Связаться с участниками
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {messageSent ? (
             <div className="text-center py-4">
-              <div className="mb-3">✅</div>
+              <div className="mb-3">
+                <span className="material-icons" style={{ fontSize: '48px', color: '#198754' }}>
+                  check_circle
+                </span>
+              </div>
               <h4>Сообщение отправлено!</h4>
               <p>Участники получат ваше сообщение и смогут связаться с вами.</p>
             </div>
@@ -142,7 +186,11 @@ function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generat
               variant="primary" 
               onClick={handleSendMessage}
               disabled={!messageText.trim()}
+              className="d-flex align-items-center"
             >
+              <span className="material-icons me-1" style={{ fontSize: '16px' }}>
+                send
+              </span>
               Отправить
             </Button>
           </Modal.Footer>

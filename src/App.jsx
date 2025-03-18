@@ -36,11 +36,6 @@ function App() {
   const [showRfc, setShowRfc] = useState(false);
   const [showDocumentation, setShowDocumentation] = useState(false);
   const [generateRfc, setGenerateRfc] = useState(false);
-  const [suggestedAudiences, setSuggestedAudiences] = useState({
-    developers: true,
-    administrators: true,
-    users: true
-  });
 
   const handleSummarySubmit = (summaryData) => {
     setLoading(true);
@@ -88,29 +83,115 @@ function App() {
           rfcType = 'research';
         }
         
+        // Извлекаем ключевые технологии из содержимого
+        const technologies = [];
+        if (summaryContent.includes('go')) technologies.push('Go');
+        if (summaryContent.includes('react')) technologies.push('React');
+        if (summaryContent.includes('typescript') || summaryContent.includes('ts')) technologies.push('TypeScript');
+        if (summaryContent.includes('javascript') || summaryContent.includes('js')) technologies.push('JavaScript');
+        if (summaryContent.includes('postgresql') || summaryContent.includes('postgres')) technologies.push('PostgreSQL');
+        if (summaryContent.includes('mongodb') || summaryContent.includes('mongo')) technologies.push('MongoDB');
+        if (summaryContent.includes('docker')) technologies.push('Docker');
+        if (summaryContent.includes('kubernetes') || summaryContent.includes('k8s')) technologies.push('Kubernetes');
+        if (summaryContent.includes('rabbitmq')) technologies.push('RabbitMQ');
+        if (summaryContent.includes('kafka')) technologies.push('Kafka');
+        if (summaryContent.includes('redis')) technologies.push('Redis');
+        if (summaryContent.includes('graphql')) technologies.push('GraphQL');
+        if (summaryContent.includes('rest')) technologies.push('REST API');
+        if (summaryContent.includes('python')) technologies.push('Python');
+        if (summaryContent.includes('java')) technologies.push('Java');
+        if (summaryContent.includes('c#')) technologies.push('C#');
+        if (summaryContent.includes('react native')) technologies.push('React Native');
+        if (summaryContent.includes('flutter')) technologies.push('Flutter');
+        if (summaryContent.includes('swift')) technologies.push('Swift');
+        if (summaryContent.includes('kotlin')) technologies.push('Kotlin');
+        
+        // Если технологии не найдены, добавляем стандартные
+        if (technologies.length === 0) {
+          if (rfcType === 'architecture') {
+            technologies.push('Kubernetes', 'Docker', 'PostgreSQL');
+          } else if (rfcType === 'research') {
+            technologies.push('TensorFlow', 'PyTorch', 'scikit-learn');
+          } else {
+            technologies.push('Go', 'PostgreSQL', 'Docker');
+          }
+        }
+        
+        // Генерируем проблемы на основе типа RFC и содержимого
+        const problems = [];
+        
+        if (rfcType === 'feature') {
+          problems.push('Текущая реализация не обеспечивает необходимый уровень функциональности');
+          problems.push('Низкая производительность при обработке большого объема данных');
+          problems.push('Отсутствие масштабируемости при увеличении нагрузки');
+          problems.push('Сложность интеграции с существующими системами');
+          
+          if (summaryContent.includes('интерфейс') || summaryContent.includes('ui') || summaryContent.includes('ux')) {
+            problems.push('Неудобный пользовательский интерфейс, снижающий эффективность работы');
+            problems.push('Отсутствие адаптивности для мобильных устройств');
+          }
+          
+          if (summaryContent.includes('api')) {
+            problems.push('Отсутствие стандартизации API');
+            problems.push('Недостаточная документация для интеграции');
+          }
+          
+          if (summaryContent.includes('безопасн') || summaryContent.includes('security')) {
+            problems.push('Уязвимости в системе безопасности');
+            problems.push('Отсутствие механизмов аудита действий пользователей');
+          }
+        } else if (rfcType === 'architecture') {
+          problems.push('Монолитная архитектура затрудняет масштабирование');
+          problems.push('Высокая связность компонентов усложняет внесение изменений');
+          problems.push('Отсутствие изоляции ошибок между компонентами');
+          problems.push('Сложность развертывания и обновления системы');
+          problems.push('Неэффективное использование ресурсов');
+          
+          if (summaryContent.includes('kubernetes') || summaryContent.includes('k8s')) {
+            problems.push('Отсутствие автоматического масштабирования');
+            problems.push('Сложность управления конфигурацией в распределенной среде');
+          }
+          
+          if (summaryContent.includes('микросервис')) {
+            problems.push('Сложность отладки распределенных транзакций');
+            problems.push('Отсутствие централизованного мониторинга и логирования');
+          }
+        } else if (rfcType === 'research') {
+          problems.push('Недостаточно данных для принятия обоснованных решений');
+          problems.push('Отсутствие четких критериев оценки технологий');
+          problems.push('Быстрое устаревание технологических решений');
+          problems.push('Сложность прогнозирования долгосрочных последствий выбора технологий');
+          
+          if (summaryContent.includes('ml') || summaryContent.includes('machine learning')) {
+            problems.push('Сложность интерпретации результатов моделей машинного обучения');
+            problems.push('Высокие требования к качеству и объему обучающих данных');
+          }
+        }
+        
         // Генерируем RFC в зависимости от типа
         if (rfcType === 'feature') {
           rfcContent = `# RFC: ${rfcTitle}
 
-## Проблема
-Текущая реализация не обеспечивает необходимый уровень функциональности и производительности.
+## Проблемы
+${problems.map(p => `- ${p}`).join('\n')}
 
 ## Предлагаемое решение
 Создание нового компонента с улучшенной архитектурой и оптимизированной производительностью.
 
 ## Технический дизайн
-- Язык программирования: Go
-- База данных: PostgreSQL
-- Контейнеризация: Docker
+${technologies.map(tech => `- ${tech}`).join('\n')}
 
-## Потенциальные проблемы
+## Потенциальные риски
 - Необходимость интеграции с существующими системами
 - Возможные проблемы с производительностью при высоких нагрузках
+- Увеличение сложности поддержки системы
+- Необходимость дополнительного обучения команды
 
 ## Следующие шаги
 1. Детальное проектирование API
 2. Разработка прототипа
-3. Тестирование с реальными данными`;
+3. Тестирование с реальными данными
+4. Постепенное внедрение в продакшн`;
         } else if (rfcType === 'architecture') {
           rfcContent = `# RFC: ${rfcTitle}
 
@@ -118,17 +199,13 @@ function App() {
 Текущая система представляет собой монолитное приложение с ограниченными возможностями масштабирования.
 
 ## Проблемы текущей архитектуры
-- Сложность масштабирования
-- Проблемы с производительностью
-- Высокая связность компонентов
+${problems.map(p => `- ${p}`).join('\n')}
 
 ## Предлагаемая архитектура
-Создание нового компонента с улучшенной архитектурой и оптимизированной производительностью.
+Переход на микросервисную архитектуру с четким разделением ответственности между компонентами.
 
 ## Технические детали
-- Язык программирования: Go
-- База данных: PostgreSQL
-- Контейнеризация: Docker
+${technologies.map(tech => `- ${tech}`).join('\n')}
 
 ## План миграции
 1. Разработка новых компонентов
@@ -138,26 +215,20 @@ function App() {
 
 ## Риски и их митигация
 - Риск простоя: использование стратегии постепенного перехода
-- Риск потери данных: резервное копирование и валидация данных`;
+- Риск потери данных: резервное копирование и валидация данных
+- Риск снижения производительности: тщательное тестирование перед внедрением
+- Риск увеличения сложности: документирование и обучение команды`;
         } else if (rfcType === 'research') {
           rfcContent = `# RFC: ${rfcTitle}
 
 ## Цель исследования
 Определить оптимальный подход к решению текущих проблем и выбрать наиболее подходящие технологии.
 
-## Текущее состояние
-Текущая система представляет собой монолитное приложение с ограниченными возможностями масштабирования.
+## Текущие проблемы
+${problems.map(p => `- ${p}`).join('\n')}
 
 ## Исследуемые технологии
-1. **Языки программирования**
-   - Go
-   - Python
-   - Java
-
-2. **Базы данных**
-   - PostgreSQL
-   - MongoDB
-   - Redis
+${technologies.map((tech, index) => `${index + 1}. **${tech}**`).join('\n')}
 
 ## Критерии оценки
 - Скорость разработки
@@ -165,179 +236,221 @@ function App() {
 - Масштабируемость
 - Удобство использования
 - Стоимость поддержки
+- Зрелость технологии
+- Доступность специалистов на рынке
 
 ## Методология исследования
 1. Анализ существующих решений
 2. Разработка прототипов
 3. Бенчмаркинг производительности
 4. Оценка удобства использования
+5. Анализ долгосрочных перспектив
 
 ## Ожидаемые результаты
-Рекомендации по выбору оптимального решения с обоснованием.`;
+Рекомендации по выбору оптимального решения с обоснованием и планом внедрения.`;
         }
         
         setRfcContent(rfcContent);
         setShowRfc(true);
       }
       
-      // Определяем целевую аудиторию на основе содержимого
-      setSuggestedAudiences({
-        developers: true,
-        administrators: true,
-        users: true
-      });
-      
       setLoading(false);
     }, 2000);
   };
 
   const handleGenerateDocumentation = () => {
-    setLoading(true);
     setShowDocumentation(true);
+  };
+
+  const handleGenerateRfc = () => {
+    setLoading(true);
     
     // Имитация запроса к API
     setTimeout(() => {
-      // Генерируем документацию для разных аудиторий
-      const devDocs = `# Документация для разработчиков: ${summary.title}
-
-## Архитектура
-Сервис построен с использованием Go, PostgreSQL, Docker. Основные компоненты:
-- API слой для обработки запросов
-- Слой бизнес-логики
-- Слой доступа к данным
-
-## API
-### POST /api/v1/data
-Отправка данных на обработку
-
-\`\`\`json
-{
-  "data": "string",
-  "priority": "high|medium|low",
-  "callback_url": "string"
-}
-\`\`\`
-
-### GET /api/v1/status/{id}
-Получение статуса обработки
-
-\`\`\`json
-{
-  "id": "string",
-  "status": "pending|processing|completed|failed",
-  "result": "object|null",
-  "error": "string|null"
-}
-\`\`\`
-
-## Обработка ошибок
-Все ошибки API возвращаются в формате:
-
-\`\`\`json
-{
-  "code": 400,
-  "message": "Bad Request",
-  "details": "Invalid data format"
-}
-\`\`\`
-
-## Развертывание
-Для локальной разработки используйте Docker Compose:
-
-\`\`\`bash
-docker-compose up -d
-\`\`\`
-`;
-
-      const adminDocs = `# Руководство администратора: ${summary.title}
-
-## Требования к системе
-- Go 1.16+
-- PostgreSQL 12+
-- Docker 20.10+
-- Docker Compose 1.29+
-
-## Установка
-1. Клонируйте репозиторий:
-\`\`\`bash
-git clone https://github.com/company/${summary.title.toLowerCase().replace(/\s+/g, '-')}.git
-cd ${summary.title.toLowerCase().replace(/\s+/g, '-')}
-\`\`\`
-
-2. Создайте файл .env с необходимыми переменными окружения:
-\`\`\`bash
-DB_HOST=localhost
-DB_PORT=5432
-DB_USER=postgres
-DB_PASSWORD=password
-\`\`\`
-
-3. Запустите сервис с помощью Docker Compose:
-\`\`\`bash
-docker-compose up -d
-\`\`\`
-
-## Конфигурация
-Основные параметры конфигурации:
-
-| Параметр | Описание | Значение по умолчанию |
-|----------|----------|------------------------|
-| PORT | Порт для HTTP сервера | 8080 |
-| LOG_LEVEL | Уровень логирования | info |
-| DB_HOST | Хост базы данных | localhost |
-| DB_PORT | Порт базы данных | 5432 |
-| DB_USER | Пользователь базы данных | postgres |
-| DB_PASSWORD | Пароль базы данных | password |
-| DB_NAME | Имя базы данных | app |
-`;
-
-      const userDocs = `# Руководство пользователя: ${summary.title}
-
-## Введение
-${summary.title} - это сервис, который позволяет обрабатывать данные и получать результаты в удобном формате.
-
-## Начало работы
-Для начала работы с сервисом вам потребуется API ключ. Обратитесь к администратору системы для получения ключа.
-
-## Основные функции
-### Работа с данными
-Приложение позволяет просматривать, создавать, редактировать и удалять данные. Для этого:
-
-1. Перейдите в раздел "Данные"
-2. Используйте кнопки и формы для работы с данными
-3. Сохраняйте изменения, нажимая кнопку "Сохранить"
-
-### Аналитика и отчеты
-Для получения аналитической информации:
-
-1. Перейдите в раздел "Отчеты"
-2. Выберите тип отчета из списка
-3. Настройте параметры отчета
-4. Нажмите "Сформировать отчет"
-
-Отчеты доступны в форматах PDF, Excel и CSV.
-
-## Часто задаваемые вопросы
-### Как сбросить пароль?
-Для сброса пароля нажмите на ссылку "Забыли пароль?" на странице входа и следуйте инструкциям.
-
-### Как изменить настройки уведомлений?
-Перейдите в раздел "Настройки" и выберите вкладку "Уведомления". Там вы можете настроить типы уведомлений и способы их доставки.
-
-## Поддержка
-При возникновении проблем обращайтесь в службу поддержки:
-
-- Email: support@example.com
-- Телефон: +7 (123) 456-78-90
-- Время работы: Пн-Пт с 9:00 до 18:00
-`;
+      // Генерация RFC на основе содержимого саммари
+      let rfcTitle = summary.title;
+      let rfcContent = '';
       
-      setDocumentationContent({
-        dev: devDocs,
-        admin: adminDocs,
-        user: userDocs
-      });
+      // Определяем тип RFC на основе содержимого
+      const summaryContent = summary.content.toLowerCase();
+      let rfcType = 'feature';
       
+      if (summaryContent.includes('архитектур') || summaryContent.includes('инфраструктур') || summaryContent.includes('kubernetes')) {
+        rfcType = 'architecture';
+      } else if (summaryContent.includes('исследован') || summaryContent.includes('анализ') || summaryContent.includes('ml') || summaryContent.includes('machine learning')) {
+        rfcType = 'research';
+      }
+      
+      // Извлекаем ключевые технологии из содержимого
+      const technologies = [];
+      if (summaryContent.includes('go')) technologies.push('Go');
+      if (summaryContent.includes('react')) technologies.push('React');
+      if (summaryContent.includes('typescript') || summaryContent.includes('ts')) technologies.push('TypeScript');
+      if (summaryContent.includes('javascript') || summaryContent.includes('js')) technologies.push('JavaScript');
+      if (summaryContent.includes('postgresql') || summaryContent.includes('postgres')) technologies.push('PostgreSQL');
+      if (summaryContent.includes('mongodb') || summaryContent.includes('mongo')) technologies.push('MongoDB');
+      if (summaryContent.includes('docker')) technologies.push('Docker');
+      if (summaryContent.includes('kubernetes') || summaryContent.includes('k8s')) technologies.push('Kubernetes');
+      if (summaryContent.includes('rabbitmq')) technologies.push('RabbitMQ');
+      if (summaryContent.includes('kafka')) technologies.push('Kafka');
+      if (summaryContent.includes('redis')) technologies.push('Redis');
+      if (summaryContent.includes('graphql')) technologies.push('GraphQL');
+      if (summaryContent.includes('rest')) technologies.push('REST API');
+      if (summaryContent.includes('python')) technologies.push('Python');
+      if (summaryContent.includes('java')) technologies.push('Java');
+      if (summaryContent.includes('c#')) technologies.push('C#');
+      if (summaryContent.includes('react native')) technologies.push('React Native');
+      if (summaryContent.includes('flutter')) technologies.push('Flutter');
+      if (summaryContent.includes('swift')) technologies.push('Swift');
+      if (summaryContent.includes('kotlin')) technologies.push('Kotlin');
+      
+      // Если технологии не найдены, добавляем стандартные
+      if (technologies.length === 0) {
+        if (rfcType === 'architecture') {
+          technologies.push('Kubernetes', 'Docker', 'PostgreSQL');
+        } else if (rfcType === 'research') {
+          technologies.push('TensorFlow', 'PyTorch', 'scikit-learn');
+        } else {
+          technologies.push('Go', 'PostgreSQL', 'Docker');
+        }
+      }
+      
+      // Генерируем проблемы на основе типа RFC и содержимого
+      const problems = [];
+      
+      if (rfcType === 'feature') {
+        problems.push('Текущая реализация не обеспечивает необходимый уровень функциональности');
+        problems.push('Низкая производительность при обработке большого объема данных');
+        problems.push('Отсутствие масштабируемости при увеличении нагрузки');
+        problems.push('Сложность интеграции с существующими системами');
+        
+        if (summaryContent.includes('интерфейс') || summaryContent.includes('ui') || summaryContent.includes('ux')) {
+          problems.push('Неудобный пользовательский интерфейс, снижающий эффективность работы');
+          problems.push('Отсутствие адаптивности для мобильных устройств');
+        }
+        
+        if (summaryContent.includes('api')) {
+          problems.push('Отсутствие стандартизации API');
+          problems.push('Недостаточная документация для интеграции');
+        }
+        
+        if (summaryContent.includes('безопасн') || summaryContent.includes('security')) {
+          problems.push('Уязвимости в системе безопасности');
+          problems.push('Отсутствие механизмов аудита действий пользователей');
+        }
+      } else if (rfcType === 'architecture') {
+        problems.push('Монолитная архитектура затрудняет масштабирование');
+        problems.push('Высокая связность компонентов усложняет внесение изменений');
+        problems.push('Отсутствие изоляции ошибок между компонентами');
+        problems.push('Сложность развертывания и обновления системы');
+        problems.push('Неэффективное использование ресурсов');
+        
+        if (summaryContent.includes('kubernetes') || summaryContent.includes('k8s')) {
+          problems.push('Отсутствие автоматического масштабирования');
+          problems.push('Сложность управления конфигурацией в распределенной среде');
+        }
+        
+        if (summaryContent.includes('микросервис')) {
+          problems.push('Сложность отладки распределенных транзакций');
+          problems.push('Отсутствие централизованного мониторинга и логирования');
+        }
+      } else if (rfcType === 'research') {
+        problems.push('Недостаточно данных для принятия обоснованных решений');
+        problems.push('Отсутствие четких критериев оценки технологий');
+        problems.push('Быстрое устаревание технологических решений');
+        problems.push('Сложность прогнозирования долгосрочных последствий выбора технологий');
+        
+        if (summaryContent.includes('ml') || summaryContent.includes('machine learning')) {
+          problems.push('Сложность интерпретации результатов моделей машинного обучения');
+          problems.push('Высокие требования к качеству и объему обучающих данных');
+        }
+      }
+      
+      // Генерируем RFC в зависимости от типа
+      if (rfcType === 'feature') {
+        rfcContent = `# RFC: ${rfcTitle}
+
+## Проблемы
+${problems.map(p => `- ${p}`).join('\n')}
+
+## Предлагаемое решение
+Создание нового компонента с улучшенной архитектурой и оптимизированной производительностью.
+
+## Технический дизайн
+${technologies.map(tech => `- ${tech}`).join('\n')}
+
+## Потенциальные риски
+- Необходимость интеграции с существующими системами
+- Возможные проблемы с производительностью при высоких нагрузках
+- Увеличение сложности поддержки системы
+- Необходимость дополнительного обучения команды
+
+## Следующие шаги
+1. Детальное проектирование API
+2. Разработка прототипа
+3. Тестирование с реальными данными
+4. Постепенное внедрение в продакшн`;
+      } else if (rfcType === 'architecture') {
+        rfcContent = `# RFC: ${rfcTitle}
+
+## Текущая архитектура
+Текущая система представляет собой монолитное приложение с ограниченными возможностями масштабирования.
+
+## Проблемы текущей архитектуры
+${problems.map(p => `- ${p}`).join('\n')}
+
+## Предлагаемая архитектура
+Переход на микросервисную архитектуру с четким разделением ответственности между компонентами.
+
+## Технические детали
+${technologies.map(tech => `- ${tech}`).join('\n')}
+
+## План миграции
+1. Разработка новых компонентов
+2. Параллельная работа старой и новой систем
+3. Постепенный переход на новую архитектуру
+4. Отключение устаревших компонентов
+
+## Риски и их митигация
+- Риск простоя: использование стратегии постепенного перехода
+- Риск потери данных: резервное копирование и валидация данных
+- Риск снижения производительности: тщательное тестирование перед внедрением
+- Риск увеличения сложности: документирование и обучение команды`;
+      } else if (rfcType === 'research') {
+        rfcContent = `# RFC: ${rfcTitle}
+
+## Цель исследования
+Определить оптимальный подход к решению текущих проблем и выбрать наиболее подходящие технологии.
+
+## Текущие проблемы
+${problems.map(p => `- ${p}`).join('\n')}
+
+## Исследуемые технологии
+${technologies.map((tech, index) => `${index + 1}. **${tech}**`).join('\n')}
+
+## Критерии оценки
+- Скорость разработки
+- Производительность
+- Масштабируемость
+- Удобство использования
+- Стоимость поддержки
+- Зрелость технологии
+- Доступность специалистов на рынке
+
+## Методология исследования
+1. Анализ существующих решений
+2. Разработка прототипов
+3. Бенчмаркинг производительности
+4. Оценка удобства использования
+5. Анализ долгосрочных перспектив
+
+## Ожидаемые результаты
+Рекомендации по выбору оптимального решения с обоснованием и планом внедрения.`;
+      }
+      
+      setRfcContent(rfcContent);
+      setShowRfc(true);
+      setGenerateRfc(true);
       setLoading(false);
     }, 2000);
   };
@@ -370,10 +483,11 @@ ${summary.title} - это сервис, который позволяет обр
             onGenerateDocumentation={handleGenerateDocumentation}
             showRfc={showRfc}
             generateRfc={generateRfc}
+            onGenerateRfc={handleGenerateRfc}
           />
         )}
         
-        {showRfc && rfcContent && (
+        {showRfc && (
           <RfcGenerator 
             content={rfcContent} 
             onGenerateDocumentation={handleGenerateDocumentation}
@@ -382,10 +496,8 @@ ${summary.title} - это сервис, который позволяет обр
         
         {showDocumentation && (
           <DocumentationGenerator 
-            content={documentationContent} 
-            onGenerate={handleGenerateDocumentation} 
-            loading={loading}
-            suggestedAudiences={suggestedAudiences}
+            summary={summary}
+            rfcContent={rfcContent}
           />
         )}
       </Container>
