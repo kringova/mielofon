@@ -33,7 +33,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "cp -r build/* . && rm -rf build && git add . && git commit -m \"Deploy to GitHub Pages\" && git push origin main"
+    "deploy": "rm -rf docs && mkdir docs && cp -r build/* docs/ && cp .nojekyll docs/ && git add . && git commit -m \"Deploy to GitHub Pages\" && git push origin main"
   },
   "eslintConfig": {
     "extends": [
