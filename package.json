@@ -2,7 +2,7 @@
   "name": "mielofon",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://kringova.github.io/mielofon",
+  "homepage": "https://<ваш-username>.github.io/mielofon",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
