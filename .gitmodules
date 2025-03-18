@@ -1,0 +1,4 @@
+[submodule "mielofon"]
+    path = mielofon
+    url = https://github.com/kringova/mielofon.git
+
