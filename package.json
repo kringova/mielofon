@@ -2,7 +2,7 @@
   "name": "mielofon",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://<ваш-username>.github.io/mielofon",
+  "homepage": "https://kringova.github.io/mielofon",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && rimraf docs && move-cli build docs",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
