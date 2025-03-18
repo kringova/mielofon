@@ -1,6 +1,43 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Badge, Button, Modal, Form } from 'react-bootstrap';
 import { Row, Col } from 'react-bootstrap';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
+
+const SimilarCard = styled(motion.div)`
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+  border: none;
+`;
+
+const SummaryItem = styled(motion.div)`
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  
+  &.selected {
+    background: var(--primary-light);
+    box-shadow: 0 4px 12px rgba(4, 217, 255, 0.12);
+    
+    h3 {
+      color: var(--primary);
+    }
+  }
+`;
 
 function SimilarSummaries({ summaries, onGenerateDocumentation, showRfc, generateRfc, onGenerateRfc }) {
   const [showModal, setShowModal] = useState(false);
