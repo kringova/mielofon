@@ -16,7 +16,6 @@
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "framer-motion": "^10.16.4",
-    "gh-pages": "^6.1.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.0",
     "react-dom": "^18.2.0",
@@ -34,9 +33,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "main -d build -r https://github.com/kringova/mielofon.git",
-    "lint": "eslint src/**/*.{js,jsx}",
-    "format": "prettier --write src/**/*.{js,jsx,css,json}"
+    "deploy": "cp -r build/* . && rm -rf build && git add . && git commit -m \"Deploy to GitHub Pages\" && git push origin main"
   },
   "eslintConfig": {
     "extends": [
