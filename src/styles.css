@@ -1139,4 +1139,46 @@ h1, h2, h3, h4, h5, h6 {
   .rfc-content h3 {
     font-size: 1.1rem;
   }
+}
+
+.summary-card h3,
+.summary-card h4,
+.similar-card h3,
+.similar-card h4 {
+  color: var(--text-dark) !important;
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  color: var(--text-dark) !important;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Обновляем стили для заголовков в карточках */
+.card-title,
+.summary-card .card-title,
+.similar-card .card-title,
+.summary-card h3,
+.summary-card h4,
+.similar-card h3,
+.similar-card h4,
+.section-title {
+  color: var(--text-dark) !important;  /* #334155 */
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+/* Обновляем стили для текста в карточках */
+.card-body,
+.summary-card .card-body,
+.similar-card .card-body {
+  color: var(--text-dark) !important;
+}
+
+/* Обновляем стили для всего текстового контента в карточках */
+.summary-card,
+.similar-card {
+  color: var(--text-dark) !important;
 } 
