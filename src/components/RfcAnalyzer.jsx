@@ -12,7 +12,7 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
     const updatedIssues = issues.filter(i => i.id !== issue.id);
     setIssues(updatedIssues);
     setFixedIssues([...fixedIssues, issue]);
-    setScore(score + (issue.severity === 'high' ? 10 : issue.severity === 'medium' ? 5 : 2));
+    setScore(score + (issue.type === 'critical' ? 10 : issue.type === 'warning' ? 5 : 2));
   };
 
   // Функция для выделения проблемных мест в тексте
@@ -31,18 +31,27 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
     // Выделяем проблемные места
     issues.forEach(issue => {
       if (issue && issue.text) {
-        const regex = new RegExp(issue.text, 'g');
-        const className = 
-          issue.severity === 'high' ? 'highlight danger' : 
-          issue.severity === 'medium' ? 'highlight warning' : 
-          'highlight info';
-        
-        htmlContent = htmlContent.replace(regex, `<span class="${className}">$&</span>`);
+        try {
+          const regex = new RegExp(escapeRegExp(issue.text), 'g');
+          const className = 
+            issue.type === 'critical' ? 'highlight danger' : 
+            issue.type === 'warning' ? 'highlight warning' : 
+            'highlight info';
+          
+          htmlContent = htmlContent.replace(regex, `<span class="${className}">$&</span>`);
+        } catch (err) {
+          console.error(`Error highlighting issue: ${err.message}`);
+        }
       }
     });
     
     return htmlContent;
   };
+
+  // Вспомогательная функция для экранирования спецсимволов в регулярных выражениях
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
 
   return (
     <div>
@@ -73,22 +82,21 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
               />
               
               <h6>Обнаруженные проблемы ({issues.length})</h6>
-              {issues.map((issue) => (
-                <Card key={issue.id} className="mb-2 issue-card">
+              {issues.map((issue, index) => (
+                <Card key={index} className="mb-2 issue-card">
                   <Card.Body className="p-2">
                     <div className="d-flex align-items-start">
                       <span className={`material-icons me-2 text-${
-                        issue.severity === 'high' ? 'danger' : 
-                        issue.severity === 'medium' ? 'warning' : 
+                        issue.type === 'critical' ? 'danger' : 
+                        issue.type === 'warning' ? 'warning' : 
                         'info'
                       }`}>
-                        {issue.severity === 'high' ? 'error' : 
-                         issue.severity === 'medium' ? 'warning' : 
+                        {issue.type === 'critical' ? 'error' : 
+                         issue.type === 'warning' ? 'warning' : 
                          'info'}
                       </span>
                       <div className="flex-grow-1">
-                        <p className="mb-1"><strong>{issue.title}</strong></p>
-                        <p className="text-muted small mb-2">{issue.description}</p>
+                        <p className="mb-1"><strong>{issue.text}</strong></p>
                         <Button 
                           size="sm" 
                           variant="outline-primary"
@@ -112,12 +120,23 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
               {fixedIssues.length > 0 && (
                 <div className="mt-4">
                   <h6>Исправленные проблемы ({fixedIssues.length})</h6>
-                  {fixedIssues.map((issue) => (
-                    <div key={issue.id} className="d-flex align-items-center mb-2">
+                  {fixedIssues.map((issue, index) => (
+                    <div key={index} className="d-flex align-items-center mb-2">
                       <span className="material-icons text-success me-2">check_circle</span>
-                      <span className="text-muted">{issue.title}</span>
+                      <span className="text-muted">{issue.text}</span>
                     </div>
                   ))}
+                </div>
+              )}
+              
+              {analysis.recommendations && (
+                <div className="mt-4">
+                  <h6>Рекомендации</h6>
+                  <ul className="ps-3">
+                    {analysis.recommendations.map((recommendation, index) => (
+                      <li key={index} className="mb-2">{recommendation}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
               

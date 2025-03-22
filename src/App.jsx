@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from './react-imports';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
@@ -67,36 +67,60 @@ function App() {
   };
 
   // Анализ RFC
-  const handleAnalyzeRfc = () => {
-    setIsAnalyzingRfc(true);
-    
-    // Имитация анализа (в реальном приложении это был бы запрос к API)
-    setTimeout(() => {
-      const analysis = {
-        score: 72,
-        issues: [
-          { type: 'critical', text: 'Не описана стратегия миграции данных', location: 'section-4' },
-          { type: 'warning', text: 'Не определены метрики для измерения успеха внедрения', location: 'section-5' },
-          { type: 'info', text: 'Рекомендуется добавить диаграмму архитектуры', location: 'section-2' },
-          { type: 'warning', text: 'Не указаны ответственные за ключевые компоненты', location: 'section-3' },
-          { type: 'critical', text: 'Отсутствует анализ рисков и план отката', location: 'section-6' }
-        ],
-        recommendations: [
-          'Свяжитесь с Марией Ивановой для консультации по миграции данных',
-          'Изучите тикет PROJ-235 с информацией о подобной миграции',
-          'Добавьте секцию с критериями успеха и измеримыми метриками',
-          'Включите план отката и стратегию минимизации рисков'
-        ]
-      };
-      setRfcAnalysis(analysis);
-      setIsAnalyzingRfc(false);
-      setSelectedStep('analyze');
-    }, 2000);
+  const handleAnalyzeRfc = (rfc) => {
+    // Создаем реалистичные моки для анализа
+    const analysisData = {
+      score: 72,
+      issues: [
+        {
+          id: 1,
+          type: 'warning',
+          text: 'Implement OAuth 2.0 for secure authorization.',
+          description: 'Необходимо указать конкретную версию OAuth 2.0 и детали реализации.'
+        },
+        {
+          id: 2,
+          type: 'warning',
+          text: 'Integrate multi-factor authentication using SMS and email.',
+          description: 'Следует уточнить механизм доставки SMS и приоритеты методов аутентификации.'
+        },
+        {
+          id: 3,
+          type: 'info',
+          text: 'Update password encryption to use bcrypt.',
+          description: 'Рекомендуется указать параметры хеширования (стоимость/раунды).'
+        },
+        {
+          id: 4,
+          type: 'info',
+          text: 'Phase 2: Development and testing (4 weeks)',
+          description: 'Фаза тестирования кажется короткой для такого критичного компонента.'
+        },
+        {
+          id: 5,
+          type: 'warning',
+          text: 'The current authentication system has several limitations',
+          description: 'Рекомендуется конкретизировать существующие ограничения с примерами.'
+        }
+      ],
+      recommendations: [
+        'Добавьте раздел "Риски и зависимости"',
+        'Опишите план отката (rollback) в случае проблем',
+        'Укажите метрики успеха внедрения'
+      ]
+    };
+
+    setCurrentRfc(rfc);
+    setRfcAnalysis(analysisData);
+    setCurrentView('rfcAnalysis');
+    setSelectedStep('analyze');
   };
 
   const handleRfcGenerated = (documentData) => {
     setCurrentRfc(documentData);
+    setGeneratedRfc(documentData);
     setCurrentView('documentation');
+    setSelectedStep('documentation');
     window.scrollTo(0, 0);
   };
 
@@ -122,25 +146,27 @@ function App() {
             <SimilarItems 
               selectedSummary={selectedSummary} 
               onRfcGenerated={handleRfcGenerated} 
+              similarItems={[]}
             />
           </div>
         )}
 
-        {selectedStep === 'documentation' && generatedRfc && (
+        {(selectedStep === 'documentation' || currentView === 'documentation') && (generatedRfc || currentRfc) && (
           <div className="fade-in">
             <h4 className="mb-4">Сгенерированный RFC документ</h4>
             <DocumentationGenerator 
-              rfc={generatedRfc} 
-              onAnalyzeRfc={handleAnalyzeRfc} 
+              rfc={generatedRfc || currentRfc} 
+              onAnalyzeRfc={handleAnalyzeRfc}
+              summary={generatedRfc || currentRfc}
             />
           </div>
         )}
 
-        {selectedStep === 'analyze' && rfcAnalysis && (
+        {(selectedStep === 'analyze' || currentView === 'rfcAnalysis') && rfcAnalysis && (
           <div className="fade-in">
             <h4 className="mb-4">Анализ RFC документа</h4>
             <RfcAnalyzer 
-              rfc={generatedRfc} 
+              rfc={currentRfc || generatedRfc} 
               analysis={rfcAnalysis} 
               onReset={handleReset} 
             />

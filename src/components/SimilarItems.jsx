@@ -13,7 +13,8 @@ const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
   const [relevantPeople, setRelevantPeople] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('meetings');
-  const [loading, setLoading] = useState(false);
+  const [loadingRfc, setLoadingRfc] = useState(false);
+  const [loadingDoc, setLoadingDoc] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -57,16 +58,29 @@ const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
   }, [selectedSummary]);
 
   const handleGenerateRfc = () => {
-    setLoading(true);
+    setLoadingRfc(true);
     setError(null);
 
     try {
-      // Используем мок-данные вместо API-вызова
-      // Выбираем мок в зависимости от ID саммари или используем случайный
-      const summaryId = selectedSummary.id || `meeting${Math.floor(Math.random() * 3) + 1}`;
+      // Сначала проверяем id, затем пробуем использовать идентификатор из моков
+      let rfcMockId = selectedSummary.id;
       
-      // Используем моки для RFC или генерируем дефолтный контент
-      const rfcData = rfcMocks[summaryId] || {
+      // Если нет прямого соответствия, ищем по номеру встречи
+      if (!rfcMocks[rfcMockId]) {
+        const meetingNumber = selectedSummary.id.match(/\d+/);
+        if (meetingNumber) {
+          rfcMockId = `meeting${meetingNumber[0]}`;
+        }
+      }
+      
+      // Если все еще нет соответствия, используем случайный мок
+      if (!rfcMocks[rfcMockId]) {
+        const mockKeys = Object.keys(rfcMocks);
+        rfcMockId = mockKeys[Math.floor(Math.random() * mockKeys.length)];
+      }
+      
+      // Используем найденный мок или создаем дефолтный
+      const rfcData = rfcMocks[rfcMockId] || {
         title: `RFC: ${selectedSummary.title}`,
         content: `
 # RFC: ${selectedSummary.title}
@@ -75,17 +89,17 @@ const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
 Документ описывает предложение по реализации "${selectedSummary.title}".
 
 ## Предпосылки
-${selectedSummary.content || "Описание текущей ситуации и предпосылок для изменений."}
+${selectedSummary.content || selectedSummary.summary?.content || "Описание текущей ситуации и предпосылок для изменений."}
 
 ## Предложение
-- Реализация новых функций
-- Оптимизация существующих процессов
-- Повышение качества разработки
+- Внедрение новых технологий
+- Оптимизация процессов
+- Улучшение пользовательского опыта
 
 ## Влияние
-- Улучшение пользовательского опыта
-- Повышение производительности системы
-- Упрощение поддержки и расширения функциональности
+- Повышение производительности
+- Улучшение качества продукта
+- Снижение затрат на поддержку
 
 ## Временные рамки
 - Фаза 1: Исследование и планирование (2 недели)
@@ -96,26 +110,31 @@ ${selectedSummary.content || "Описание текущей ситуации �
 ${selectedSummary.participants ? selectedSummary.participants.join(', ') : 'Не указаны'}
 
 ## Связанные материалы
-${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Нет связанных материалов'}
-        `,
+- Саммари: ${selectedSummary.title}
+`,
         participants: selectedSummary.participants || [],
         relatedItems: selectedSummary.relatedItems || []
       };
 
-      // Имитация задержки для более реалистичного поведения
+      // Добавим задержку для имитации обработки
       setTimeout(() => {
-        onRfcGenerated(rfcData);
-        setLoading(false);
+        if (onRfcGenerated) {
+          onRfcGenerated(rfcData);
+        } else {
+          console.error("onRfcGenerated не определен");
+          setError('Ошибка передачи данных. Попробуйте еще раз.');
+        }
+        setLoadingRfc(false);
       }, 1000);
     } catch (err) {
       console.error("Error generating RFC:", err);
       setError('Не удалось сгенерировать RFC. Попробуйте еще раз.');
-      setLoading(false);
+      setLoadingRfc(false);
     }
   };
 
   const handleGenerateDocumentation = () => {
-    setLoading(true);
+    setLoadingDoc(true);
     setError(null);
 
     try {
@@ -157,12 +176,12 @@ ${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Не
 
       setTimeout(() => {
         onRfcGenerated(docData);
-        setLoading(false);
+        setLoadingDoc(false);
       }, 1000);
     } catch (err) {
       console.error("Error generating documentation:", err);
       setError('Не удалось сгенерировать документацию. Попробуйте еще раз.');
-      setLoading(false);
+      setLoadingDoc(false);
     }
   };
 
@@ -206,22 +225,22 @@ ${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Не
               variant="primary"
               size="lg"
               onClick={handleGenerateRfc}
-              disabled={loading}
+              disabled={loadingRfc}
               className="d-flex align-items-center justify-content-center mb-2"
             >
               <span className="material-icons me-2">description</span>
-              {loading ? 'Создание...' : 'Создать RFC'}
+              {loadingRfc ? 'Создание...' : 'Создать RFC'}
             </Button>
             
             <Button 
               variant="success"
               size="lg"
               onClick={handleGenerateDocumentation}
-              disabled={loading}
+              disabled={loadingDoc}
               className="d-flex align-items-center justify-content-center"
             >
               <span className="material-icons me-2">auto_stories</span>
-              {loading ? 'Создание...' : 'Создать документацию'}
+              {loadingDoc ? 'Создание...' : 'Создать документацию'}
             </Button>
           </div>
 
