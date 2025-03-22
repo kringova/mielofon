@@ -4,6 +4,7 @@ import { meetings } from '../data/meetings';
 import { tickets } from '../data/tickets';
 import { wiki } from '../data/wiki';
 import { similarityService } from '../utils/similarityService';
+import rfcMocks from '../data/rfcMocks';
 
 const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
   const [similarMeetings, setSimilarMeetings] = useState([]);
@@ -59,10 +60,10 @@ const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
     setLoading(true);
     setError(null);
 
-    // Мок данных для RFC
-    const rfcData = {
-      title: selectedSummary.title,
-      content: `RFC content for ${selectedSummary.title}`,
+    // Используем моки для RFC
+    const rfcData = rfcMocks[selectedSummary.id] || {
+      title: `RFC for ${selectedSummary.title}`,
+      content: `Default RFC content for ${selectedSummary.title}`,
       participants: selectedSummary.participants,
       relatedItems: similarItems
     };
