@@ -61,7 +61,8 @@ const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
     setError(null);
 
     try {
-      // Пытаемся найти мок по идентификатору
+      // Используем мок-данные вместо API-вызова
+      // Выбираем мок в зависимости от ID саммари или используем случайный
       const summaryId = selectedSummary.id || `meeting${Math.floor(Math.random() * 3) + 1}`;
       
       // Используем моки для RFC или генерируем дефолтный контент
@@ -95,12 +96,13 @@ ${selectedSummary.content || "Описание текущей ситуации �
 ${selectedSummary.participants ? selectedSummary.participants.join(', ') : 'Не указаны'}
 
 ## Связанные материалы
-${similarItems && similarItems.length > 0 ? similarItems.map(item => `- ${item.title || item}`).join('\n') : 'Нет связанных материалов'}
+${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Нет связанных материалов'}
         `,
         participants: selectedSummary.participants || [],
-        relatedItems: similarItems || []
+        relatedItems: selectedSummary.relatedItems || []
       };
 
+      // Имитация задержки для более реалистичного поведения
       setTimeout(() => {
         onRfcGenerated(rfcData);
         setLoading(false);
@@ -148,9 +150,9 @@ ${selectedSummary.content || "Документация содержит подр
 4. Используйте инструменты анализа для улучшения качества
 
 ## Связанные материалы
-${similarItems && similarItems.length > 0 ? similarItems.map(item => `- ${item.title || item}`).join('\n') : 'Нет связанных материалов'}
+${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Нет связанных материалов'}
         `,
-        relatedItems: similarItems || []
+        relatedItems: selectedSummary.relatedItems || []
       };
 
       setTimeout(() => {
