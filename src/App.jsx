@@ -33,6 +33,8 @@ function App() {
   const [generatedRfc, setGeneratedRfc] = useState(null);
   const [isAnalyzingRfc, setIsAnalyzingRfc] = useState(false);
   const [rfcAnalysis, setRfcAnalysis] = useState(null);
+  const [currentRfc, setCurrentRfc] = useState(null);
+  const [currentView, setCurrentView] = useState('summary');
 
   // Переход к следующему шагу
   const handleNextStep = (step) => {
@@ -118,7 +120,7 @@ function App() {
             <h4 className="mb-4">Анализ похожих материалов</h4>
             <SimilarItems 
               selectedSummary={selectedSummary} 
-              onGenerateRfc={handleGenerateRfc} 
+              onRfcGenerated={handleRfcGenerated} 
             />
           </div>
         )}
