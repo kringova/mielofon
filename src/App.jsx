@@ -71,8 +71,10 @@ function App() {
   // Генерация RFC
   const handleGenerateRfc = (data) => {
     console.log("Получены данные RFC, размер контента:", data.content.length);
-    // Прямое обновление состояния без изменений данных
-    setCurrentRfc(data);
+    // Сохраняем копию данных, чтобы избежать мутации
+    const dataCopy = JSON.parse(JSON.stringify(data));
+    setCurrentRfc(dataCopy);
+    setGeneratedRfc(dataCopy);
     setSelectedStep('documentation');
     window.scrollTo(0, 0);
   };

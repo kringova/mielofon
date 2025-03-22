@@ -139,27 +139,57 @@ ${selectedSummary.participants ? selectedSummary.participants.join(', ') : 'Не
     setError(null);
 
     try {
-      // Получаем ID встречи или используем случайное
-      const meetingId = selectedSummary?.id || `meeting${Math.floor(Math.random() * 3) + 1}`;
+      // Получаем ID саммари
+      const summaryId = selectedSummary?.id;
+      
+      // Извлекаем номер из ID саммари, если есть
+      let meetingId;
+      const meetingMatch = summaryId?.match(/meeting(\d+)/);
+      if (meetingMatch) {
+        meetingId = `meeting${meetingMatch[1]}`;
+      } else {
+        // Если не удалось извлечь номер, используем первые 3 символа типа и мапим на meeting1/2/3
+        const summaryType = selectedSummary?.type || 'tech';
+        const typeMap = {
+          'tec': 'meeting1', // технические
+          'pro': 'meeting2', // продуктовые
+          'org': 'meeting3', // организационные
+          'arc': 'meeting1', // архитектурные (прямое соответствие)
+        };
+        
+        meetingId = typeMap[summaryType.substring(0, 3)] || `meeting${Math.floor(Math.random() * 3) + 1}`;
+      }
       
       console.log("Ищем документацию для:", meetingId, audienceType);
       
-      // Получаем документацию из моков или создаем запасной вариант
+      // Проверяем существование документации
+      if (!documentationMocks[meetingId] || !documentationMocks[meetingId][audienceType]) {
+        console.warn(`Документация не найдена для ${meetingId}/${audienceType}, используем meeting1`);
+        // Если не нашли конкретной документации, используем meeting1
+        meetingId = 'meeting1';
+      }
+      
+      // Теперь точно используем существующую документацию или явный запасной вариант
       const docData = documentationMocks[meetingId] && documentationMocks[meetingId][audienceType] 
-        ? { ...documentationMocks[meetingId][audienceType] }  // Создаем копию объекта
+        ? JSON.parse(JSON.stringify(documentationMocks[meetingId][audienceType]))
         : {
             title: `Документация для ${audienceType}: ${selectedSummary?.title || "Новой встречи"}`,
             content: `Автоматически сгенерированная документация для "${selectedSummary?.title || "встречи"}" в формате, подходящем для ${audienceType} аудитории.`
           };
       
-      // Добавляем логирование для отладки
-      console.log("Генерируем документацию, длина контента:", docData.content.length);
+      // Логирование для отладки
+      console.log("Генерируем документацию:", {
+        meetingId,
+        audienceType,
+        title: docData.title,
+        contentLength: docData.content.length
+      });
 
+      // Генерируем документацию с задержкой для имитации обработки
       setTimeout(() => {
         if (onRfcGenerated) {
-          // Убедитесь, что передаете полный объект без изменений
           onRfcGenerated(docData);
-          window.scrollTo(0, 0); // Прокручиваем страницу вверх
+          window.scrollTo(0, 0);
         } else {
           console.error("onRfcGenerated не определен");
           setError('Ошибка передачи данных. Попробуйте еще раз.');
