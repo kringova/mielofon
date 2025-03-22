@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Row, Col, Card, Button, Form, Tab, Nav } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
+import styled from 'styled-components';
+import { motion } from 'framer-motion';
 
 const DocumentationGenerator = ({ rfc, onAnalyzeRfc }) => {
   const [selectedAudience, setSelectedAudience] = useState('technical');
-  const [showFullContent, setShowFullContent] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   // Генерация контента в зависимости от выбранной аудитории
   const getAudienceContent = () => {
@@ -54,15 +56,8 @@ Sprint 24 (2 недели)`;
 
   // Обновляем обработчик для кнопки "Анализировать RFC"
   const handleAnalyzeClick = () => {
-    // Проверяем, что функция onAnalyzeRfc передана как свойство
-    if (typeof onAnalyzeRfc === 'function') {
-      // Вызываем переданный обработчик
-      onAnalyzeRfc();
-      
-      // Для отладки можно добавить лог
-      console.log("Анализ RFC запущен");
-    } else {
-      console.error("Ошибка: функция onAnalyzeRfc не определена");
+    if (onAnalyzeRfc) {
+      onAnalyzeRfc(rfc);
     }
   };
 
@@ -113,19 +108,16 @@ Sprint 24 (2 недели)`;
               variant="primary"
               size="lg"
               onClick={handleAnalyzeClick}
+              disabled={loading}
               className="d-flex align-items-center justify-content-center"
             >
-              <span className="material-icons me-2">analytics</span>
-              Анализировать RFC
+              {loading ? 'Анализ...' : (
+                <>
+                  <span className="material-icons me-2">analytics</span>
+                  Анализировать RFC
+                </>
+              )}
             </Button>
-            <Form.Check
-              type="switch"
-              id="show-full-content"
-              label="Показать полное содержание"
-              checked={showFullContent}
-              onChange={() => setShowFullContent(!showFullContent)}
-              className="mt-3"
-            />
           </div>
         </Col>
 
@@ -146,7 +138,7 @@ Sprint 24 (2 недели)`;
             <Card.Body>
               <div className="rfc-content">
                 <ReactMarkdown>
-                  {showFullContent ? rfc.content : getAudienceContent()}
+                  {getAudienceContent()}
                 </ReactMarkdown>
               </div>
             </Card.Body>
@@ -156,5 +148,22 @@ Sprint 24 (2 недели)`;
     </div>
   );
 };
+
+const StyledCard = styled(Card)`
+  margin-bottom: 2rem;
+  border: none;
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+`;
+
+const ContentSection = styled.div`
+  margin-bottom: 1.5rem;
+  white-space: pre-wrap;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
 
 export default DocumentationGenerator; 

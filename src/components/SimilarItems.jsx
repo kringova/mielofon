@@ -5,13 +5,15 @@ import { tickets } from '../data/tickets';
 import { wiki } from '../data/wiki';
 import { similarityService } from '../utils/similarityService';
 
-const SimilarItems = ({ selectedSummary, onGenerateRfc }) => {
+const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
   const [similarMeetings, setSimilarMeetings] = useState([]);
   const [relatedTickets, setRelatedTickets] = useState([]);
   const [relatedWiki, setRelatedWiki] = useState([]);
   const [relevantPeople, setRelevantPeople] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('meetings');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Имитация запроса к сервису для нахождения похожих материалов
@@ -54,99 +56,38 @@ const SimilarItems = ({ selectedSummary, onGenerateRfc }) => {
   }, [selectedSummary]);
 
   const handleGenerateRfc = () => {
-    // Проверки на наличие данных
-    if (!selectedSummary) {
-      console.error("Ошибка: отсутствует выбранное саммари");
-      return;
-    }
-    
-    // Создаем RFC на основе выбранного саммари и связанных материалов
-    const rfc = {
-      title: `RFC: ${selectedSummary.summary.title}`,
-      author: "Текущий пользователь",
-      date: new Date().toISOString(),
-      content: `# ${selectedSummary.summary.title}
+    setLoading(true);
+    setError(null);
 
-## 1. Введение
-${selectedSummary.summary.content}
-
-## 2. Обоснование
-На основании проведённой встречи и анализа существующих материалов, предлагается реализовать описанные выше решения для повышения эффективности работы команды и продукта.
-
-## 3. Предлагаемые решения
-${selectedSummary.summary.decisions.map(decision => `- ${decision}`).join('\n')}
-
-## 4. Технические детали
-${relatedTickets.length > 0 ? 
-  `В процессе реализации необходимо учесть следующие задачи:
-${relatedTickets.map(ticket => `- ${ticket.title} (${ticket.status})`).join('\n')}` 
-  : 'Технические детали будут проработаны в процессе реализации.'}
-
-## 5. Метрики успеха
-*Данный раздел не заполнен*
-
-## 6. Риски и план отката
-*Данный раздел не заполнен*
-
-## 7. Ссылки на дополнительные материалы
-${relatedWiki.length > 0 ? 
-  relatedWiki.map(w => `- [${w.title}](${w.url})`).join('\n') 
-  : 'Дополнительные материалы отсутствуют.'}
-`
+    // Мок данных для RFC
+    const rfcData = {
+      title: selectedSummary.title,
+      content: `RFC content for ${selectedSummary.title}`,
+      participants: selectedSummary.participants,
+      relatedItems: similarItems
     };
-    
-    // Вызываем обработчик с готовым RFC
-    onGenerateRfc(rfc);
+
+    setTimeout(() => {
+      onRfcGenerated(rfcData);
+      setLoading(false);
+    }, 1000);
   };
-  
-  // Функция для генерации документации (отдельная от RFC)
+
   const handleGenerateDocumentation = () => {
-    if (!selectedSummary) {
-      console.error("Ошибка: отсутствует выбранное саммари");
-      return;
-    }
-    
-    // Создаем документацию на основе выбранного саммари и связанных материалов
-    const documentation = {
-      title: `Документация: ${selectedSummary.summary.title}`,
-      author: "Текущий пользователь",
-      date: new Date().toISOString(),
-      type: "documentation", // Добавляем тип для обработки в App.jsx
-      content: `# Документация: ${selectedSummary.summary.title}
+    setLoading(true);
+    setError(null);
 
-## Общая информация
-**Тип встречи**: ${selectedSummary.type === 'technical' ? 'Техническая' : 
-                   selectedSummary.type === 'product' ? 'Продуктовая' : 'Организационная'}
-**Дата**: ${new Date(selectedSummary.date).toLocaleDateString()}
-**Участники**: ${selectedSummary.participants.map(p => p.name).join(', ')}
-
-## Содержание саммари
-${selectedSummary.summary.content}
-
-## Принятые решения
-${selectedSummary.summary.decisions.map(decision => `- ${decision}`).join('\n')}
-
-## Связанные материалы
-
-### Тикеты
-${relatedTickets.length > 0 ? 
-  relatedTickets.map(ticket => `- **${ticket.title}** (${ticket.status}, ${ticket.priority}): ${ticket.description.substring(0, 100)}...`).join('\n') 
-  : 'Связанные тикеты отсутствуют.'}
-
-### Вики-страницы
-${relatedWiki.length > 0 ? 
-  relatedWiki.map(w => `- [${w.title}](${w.url}): ${w.summary.substring(0, 100)}...`).join('\n') 
-  : 'Связанные вики-страницы отсутствуют.'}
-
-## Люди для консультации
-${relevantPeople.length > 0 ?
-  relevantPeople.map(person => `- **${person.name}** (${person.role})`).join('\n')
-  : 'Рекомендации по консультациям отсутствуют.'}
-`
+    // Мок данных для документации
+    const docData = {
+      title: selectedSummary.title,
+      content: `Documentation content for ${selectedSummary.title}`,
+      relatedItems: similarItems
     };
-    
-    // Вызываем тот же обработчик, но с объектом документации
-    onGenerateRfc(documentation);
+
+    setTimeout(() => {
+      onRfcGenerated(docData);
+      setLoading(false);
+    }, 1000);
   };
 
   // Отображение состояния загрузки
@@ -189,22 +130,33 @@ ${relevantPeople.length > 0 ?
               variant="primary"
               size="lg"
               onClick={handleGenerateRfc}
+              disabled={loading}
               className="d-flex align-items-center justify-content-center mb-2"
             >
               <span className="material-icons me-2">description</span>
-              Создать RFC
+              {loading ? 'Создание...' : 'Создать RFC'}
             </Button>
             
             <Button 
               variant="success"
               size="lg"
               onClick={handleGenerateDocumentation}
+              disabled={loading}
               className="d-flex align-items-center justify-content-center"
             >
               <span className="material-icons me-2">auto_stories</span>
-              Создать документацию
+              {loading ? 'Создание...' : 'Создать документацию'}
             </Button>
           </div>
+
+          {error && (
+            <div className="text-center">
+              <span className="text-danger">
+                <span className="material-icons">error</span>
+                {error}
+              </span>
+            </div>
+          )}
 
           <Card className="mb-4">
             <Card.Body>

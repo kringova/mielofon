@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, Button, Row, Col, Alert, Tabs, Tab, Badge } from 'react-bootstrap';
+import { generateSummary } from '../services/api';
 
 // Получаем иконку для категории
 const getCategoryIcon = (category) => {
@@ -116,29 +117,6 @@ const StyledButton = styled(motion.button)`
   }
 `;
 
-const ExamplesGrid = styled(motion.div)`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--spacing-md);
-  margin-top: var(--spacing-md);
-`;
-
-const ExampleButton = styled(motion.button)`
-  background: var(--bg-white);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
-  color: var(--text-dark);
-  padding: var(--spacing-sm);
-  text-align: left;
-  transition: var(--transition);
-  cursor: pointer;
-  
-  &:hover {
-    border-color: var(--primary);
-    color: var(--primary);
-  }
-`;
-
 const ErrorMessage = styled(motion.div)`
   color: var(--error);
   font-size: 0.875rem;
@@ -152,55 +130,31 @@ const ErrorMessage = styled(motion.div)`
   }
 `;
 
-const SummaryInput = ({ onSubmit }) => {
+export const SummaryInput = ({ onSummaryGenerated }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('Разработка');
-  const [showExamples, setShowExamples] = useState(false);
-  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleSubmit = () => {
-    if (!title.trim() || !content.trim()) {
-      setError('Пожалуйста, заполните все поля');
-      return;
-    }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
     
-    const summary = {
-      title: title.trim(),
-      content: content.trim(),
-      category,
-      timestamp: new Date().toISOString()
-    };
-
-    onSubmit(summary);
-    setTitle('');
-    setContent('');
-    setError('');
-  };
-
-  const examples = [
-    { 
-      title: 'Обновление API', 
-      content: 'Добавлены новые эндпоинты для работы с пользователями',
-      category: 'Разработка'
-    },
-    { 
-      title: 'Оптимизация кеша', 
-      content: 'Улучшена производительность кеширования данных',
-      category: 'Инфраструктура'
-    },
-    { 
-      title: 'Рефакторинг UI', 
-      content: 'Переработан интерфейс главной страницы',
-      category: 'Продукт'
+    try {
+      const summary = await generateSummary({
+        title: event.target.title.value,
+        content: event.target.content.value,
+        category: event.target.category.value
+      });
+      
+      onSummaryGenerated(summary);
+    } catch (err) {
+      setError('Не удалось сгенерировать саммари. Попробуйте еще раз.');
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const handleExampleClick = (example) => {
-    setTitle(example.title);
-    setContent(example.content);
-    setCategory(example.category);
-    setShowExamples(false);
   };
 
   const categories = ['Разработка', 'Инфраструктура', 'Продукт'];
@@ -257,44 +211,14 @@ const SummaryInput = ({ onSubmit }) => {
 
       <ButtonRow>
         <StyledButton
-          onClick={() => setShowExamples(!showExamples)}
-        >
-          <span className="icon material-icons">
-            {showExamples ? 'visibility_off' : 'visibility'}
-          </span>
-          {showExamples ? 'Скрыть примеры' : 'Показать примеры'}
-        </StyledButton>
-
-        <StyledButton
           primary
           onClick={handleSubmit}
+          disabled={loading}
         >
           <span className="icon material-icons">send</span>
-          Создать
+          {loading ? 'Создание...' : 'Создать'}
         </StyledButton>
       </ButtonRow>
-
-      <AnimatePresence>
-        {showExamples && (
-          <ExamplesGrid
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-          >
-            {examples.map((example, index) => (
-              <ExampleButton
-                key={index}
-                onClick={() => handleExampleClick(example)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="icon material-icons">{getCategoryIcon(example.category)}</span>
-                {example.title}
-              </ExampleButton>
-            ))}
-          </ExamplesGrid>
-        )}
-      </AnimatePresence>
     </SummaryCard>
   );
 };

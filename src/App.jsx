@@ -92,6 +92,11 @@ function App() {
     }, 2000);
   };
 
+  const handleRfcGenerated = (documentData) => {
+    setGeneratedRfc(documentData);
+    setSelectedStep('documentation');
+  };
+
   return (
     <div className="app">
       <Header onReset={handleReset} />
