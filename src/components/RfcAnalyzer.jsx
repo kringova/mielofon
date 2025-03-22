@@ -5,15 +5,6 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
   const [improvedContent, setImprovedContent] = useState(rfc.content);
   const [score, setScore] = useState(analysis.score);
   const [issues, setIssues] = useState(analysis.issues);
-  const [fixedIssues, setFixedIssues] = useState([]);
-
-  const handleFixIssue = (issue) => {
-    // Имитация исправления проблемы
-    const updatedIssues = issues.filter(i => i.id !== issue.id);
-    setIssues(updatedIssues);
-    setFixedIssues([...fixedIssues, issue]);
-    setScore(score + (issue.type === 'critical' ? 10 : issue.type === 'warning' ? 5 : 2));
-  };
 
   // Функция для выделения проблемных мест в тексте
   const getHighlightedContent = () => {
@@ -97,13 +88,9 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
                       </span>
                       <div className="flex-grow-1">
                         <p className="mb-1"><strong>{issue.text}</strong></p>
-                        <Button 
-                          size="sm" 
-                          variant="outline-primary"
-                          onClick={() => handleFixIssue(issue)}
-                        >
-                          Исправить
-                        </Button>
+                        {issue.description && (
+                          <p className="text-muted small mb-0">{issue.description}</p>
+                        )}
                       </div>
                     </div>
                   </Card.Body>
@@ -113,19 +100,7 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
               {issues.length === 0 && (
                 <div className="text-center py-3">
                   <span className="material-icons text-success mb-2" style={{ fontSize: '48px' }}>check_circle</span>
-                  <p>Все проблемы устранены!</p>
-                </div>
-              )}
-              
-              {fixedIssues.length > 0 && (
-                <div className="mt-4">
-                  <h6>Исправленные проблемы ({fixedIssues.length})</h6>
-                  {fixedIssues.map((issue, index) => (
-                    <div key={index} className="d-flex align-items-center mb-2">
-                      <span className="material-icons text-success me-2">check_circle</span>
-                      <span className="text-muted">{issue.text}</span>
-                    </div>
-                  ))}
+                  <p>Проблем не обнаружено!</p>
                 </div>
               )}
               
