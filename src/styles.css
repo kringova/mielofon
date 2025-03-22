@@ -1181,4 +1181,80 @@ h1, h2, h3, h4, h5, h6 {
 .summary-card,
 .similar-card {
   color: var(--text-dark) !important;
+}
+
+/* Добавьте эти стили для единообразного отображения markdown */
+.markdown-body {
+  font-family: var(--font-family);
+  line-height: 1.6;
+  color: var(--text-dark);
+}
+
+.markdown-body h1 {
+  font-size: 1.75rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-dark);
+}
+
+.markdown-body h2 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-dark);
+}
+
+.markdown-body h3 {
+  font-size: 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-dark);
+}
+
+.markdown-body ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-body p {
+  margin-bottom: 1rem;
+}
+
+.markdown-body strong {
+  font-weight: 600;
+}
+
+.markdown-body em {
+  font-style: italic;
+}
+
+/* Стили для подсветки проблем */
+.highlight {
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+.highlight.danger {
+  background-color: rgba(220, 53, 69, 0.15);
+  border-bottom: 2px solid var(--danger);
+}
+
+.highlight.warning {
+  background-color: rgba(255, 193, 7, 0.15);
+  border-bottom: 2px solid var(--warning);
+}
+
+.highlight.info {
+  background-color: rgba(13, 202, 240, 0.15);
+  border-bottom: 2px solid var(--info);
 } 
