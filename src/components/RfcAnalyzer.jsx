@@ -30,13 +30,15 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
 
     // Выделяем проблемные места
     issues.forEach(issue => {
-      const regex = new RegExp(issue.text, 'g');
-      const className = 
-        issue.severity === 'high' ? 'highlight danger' : 
-        issue.severity === 'medium' ? 'highlight warning' : 
-        'highlight info';
-      
-      htmlContent = htmlContent.replace(regex, `<span class="${className}">$&</span>`);
+      if (issue && issue.text) {
+        const regex = new RegExp(issue.text, 'g');
+        const className = 
+          issue.severity === 'high' ? 'highlight danger' : 
+          issue.severity === 'medium' ? 'highlight warning' : 
+          'highlight info';
+        
+        htmlContent = htmlContent.replace(regex, `<span class="${className}">$&</span>`);
+      }
     });
     
     return htmlContent;
@@ -137,7 +139,6 @@ const RfcAnalyzer = ({ rfc, analysis, onReset }) => {
               <h5 className="mb-0">{rfc.title}</h5>
             </Card.Header>
             <Card.Body>
-              {/* Используем div вместо ReactMarkdown для единообразного отображения */}
               <div className="rfc-content markdown-body" dangerouslySetInnerHTML={{ __html: getHighlightedContent() }}></div>
             </Card.Body>
           </Card>

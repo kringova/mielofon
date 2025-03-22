@@ -95,8 +95,9 @@ function App() {
   };
 
   const handleRfcGenerated = (documentData) => {
-    setGeneratedRfc(documentData);
-    setSelectedStep('documentation');
+    setCurrentRfc(documentData);
+    setCurrentView('documentation');
+    window.scrollTo(0, 0);
   };
 
   return (
