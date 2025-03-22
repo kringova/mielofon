@@ -5,6 +5,7 @@ import { tickets } from '../data/tickets';
 import { wiki } from '../data/wiki';
 import { similarityService } from '../utils/similarityService';
 import rfcMocks from '../data/rfcMocks';
+import documentationMocks from '../data/documentationMocks';
 
 const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
   const [similarMeetings, setSimilarMeetings] = useState([]);
@@ -133,49 +134,36 @@ ${selectedSummary.participants ? selectedSummary.participants.join(', ') : 'Не
     }
   };
 
-  const handleGenerateDocumentation = () => {
+  const handleGenerateDocumentation = (audienceType = "user") => {
     setLoadingDoc(true);
     setError(null);
 
     try {
-      // Мок данных для документации
-      const docData = {
-        title: `Документация: ${selectedSummary.title}`,
-        content: `
-# Документация: ${selectedSummary.title}
-
-## Общее описание
-${selectedSummary.content || "Документация содержит подробное описание функциональности и инструкции по использованию."}
-
-## Назначение системы
-Система предназначена для оптимизации процессов управления знаниями и повышения эффективности командной работы.
-
-## Функциональные требования
-1. Создание и хранение саммари встреч
-2. Анализ связанных материалов
-3. Генерация различных типов документации
-4. Интеграция с внешними системами
-
-## Технические требования
-- Frontend: React, Styled Components
-- Backend: Node.js, Express
-- База данных: MongoDB
-- Интеграции: REST API, GraphQL
-
-## Инструкция по использованию
-1. Создайте саммари в разделе "Создание саммари"
-2. Проанализируйте похожие материалы
-3. Сгенерируйте необходимую документацию
-4. Используйте инструменты анализа для улучшения качества
-
-## Связанные материалы
-${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Нет связанных материалов'}
-        `,
-        relatedItems: selectedSummary.relatedItems || []
-      };
+      // Получаем ID встречи или используем случайное
+      const meetingId = selectedSummary?.id || `meeting${Math.floor(Math.random() * 3) + 1}`;
+      
+      console.log("Ищем документацию для:", meetingId, audienceType);
+      
+      // Получаем документацию из моков или создаем запасной вариант
+      const docData = documentationMocks[meetingId] && documentationMocks[meetingId][audienceType] 
+        ? { ...documentationMocks[meetingId][audienceType] }  // Создаем копию объекта
+        : {
+            title: `Документация для ${audienceType}: ${selectedSummary?.title || "Новой встречи"}`,
+            content: `Автоматически сгенерированная документация для "${selectedSummary?.title || "встречи"}" в формате, подходящем для ${audienceType} аудитории.`
+          };
+      
+      // Добавляем логирование для отладки
+      console.log("Генерируем документацию, длина контента:", docData.content.length);
 
       setTimeout(() => {
-        onRfcGenerated(docData);
+        if (onRfcGenerated) {
+          // Убедитесь, что передаете полный объект без изменений
+          onRfcGenerated(docData);
+          window.scrollTo(0, 0); // Прокручиваем страницу вверх
+        } else {
+          console.error("onRfcGenerated не определен");
+          setError('Ошибка передачи данных. Попробуйте еще раз.');
+        }
         setLoadingDoc(false);
       }, 1000);
     } catch (err) {
@@ -235,12 +223,34 @@ ${selectedSummary.relatedItems ? selectedSummary.relatedItems.join('\n') : 'Не
             <Button 
               variant="success"
               size="lg"
-              onClick={handleGenerateDocumentation}
+              onClick={() => handleGenerateDocumentation("technical")}
               disabled={loadingDoc}
               className="d-flex align-items-center justify-content-center"
             >
               <span className="material-icons me-2">auto_stories</span>
-              {loadingDoc ? 'Создание...' : 'Создать документацию'}
+              {loadingDoc ? 'Создание...' : 'Создать техническую документацию'}
+            </Button>
+            
+            <Button 
+              variant="success"
+              size="lg"
+              onClick={() => handleGenerateDocumentation("management")}
+              disabled={loadingDoc}
+              className="d-flex align-items-center justify-content-center"
+            >
+              <span className="material-icons me-2">auto_stories</span>
+              {loadingDoc ? 'Создание...' : 'Создать управленческую документацию'}
+            </Button>
+            
+            <Button 
+              variant="success"
+              size="lg"
+              onClick={() => handleGenerateDocumentation("user")}
+              disabled={loadingDoc}
+              className="d-flex align-items-center justify-content-center"
+            >
+              <span className="material-icons me-2">auto_stories</span>
+              {loadingDoc ? 'Создание...' : 'Создать пользовательскую документацию'}
             </Button>
           </div>
 

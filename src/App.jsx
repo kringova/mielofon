@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles.css';
+// import { marked } from 'marked';
+import ReactMarkdown from 'react-markdown';
 
 import Header from './components/Header';
 import SummarySelector from './components/SummarySelector';
@@ -26,6 +28,15 @@ import {
   generateAdminDocumentation,
   generateUserDocumentation
 } from './utils/documentationUtils';
+
+// Настройте marked для обработки всего контента
+// marked.setOptions({
+//   breaks: true,         // Перенос строк соответствует разрывам строк
+//   gfm: true,            // GitHub Flavored Markdown
+//   headerIds: true,      // Включить идентификаторы заголовков для навигации
+//   mangle: false,        // Отключить экранирование
+//   sanitize: false       // Разрешить HTML-теги
+// });
 
 function App() {
   const [selectedSummary, setSelectedSummary] = useState(null);
@@ -58,10 +69,10 @@ function App() {
   };
 
   // Генерация RFC
-  const handleGenerateRfc = (content) => {
-    console.log("Сгенерирован контент:", content.type || "RFC");
-    
-    setGeneratedRfc(content);
+  const handleGenerateRfc = (data) => {
+    console.log("Получены данные RFC, размер контента:", data.content.length);
+    // Прямое обновление состояния без изменений данных
+    setCurrentRfc(data);
     setSelectedStep('documentation');
     window.scrollTo(0, 0);
   };
@@ -124,6 +135,26 @@ function App() {
     window.scrollTo(0, 0);
   };
 
+  const renderRfcContent = () => {
+    if (!currentRfc) return null;
+    
+    return (
+      <div className="rfc-content">
+        <h2>{currentRfc.title}</h2>
+        <div className="markdown-content">
+          <pre style={{ 
+            whiteSpace: 'pre-wrap', 
+            fontFamily: 'inherit',
+            margin: 0,
+            padding: 0
+          }}>
+            {currentRfc.content}
+          </pre>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="app">
       <Header onReset={handleReset} />
@@ -151,13 +182,13 @@ function App() {
           </div>
         )}
 
-        {(selectedStep === 'documentation' || currentView === 'documentation') && (generatedRfc || currentRfc) && (
+        {(selectedStep === 'documentation' || currentView === 'documentation') && generatedRfc && (
           <div className="fade-in">
             <h4 className="mb-4">Сгенерированный RFC документ</h4>
             <DocumentationGenerator 
-              rfc={generatedRfc || currentRfc} 
+              rfc={generatedRfc} 
               onAnalyzeRfc={handleAnalyzeRfc}
-              summary={generatedRfc || currentRfc}
+              summary={generatedRfc}
             />
           </div>
         )}
