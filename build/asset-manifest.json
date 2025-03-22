@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/mielofon/static/css/main.5e0a8563.css",
-    "main.js": "/mielofon/static/js/main.01034eb9.js",
+    "main.js": "/mielofon/static/js/main.86237a96.js",
     "index.html": "/mielofon/index.html",
     "main.5e0a8563.css.map": "/mielofon/static/css/main.5e0a8563.css.map",
-    "main.01034eb9.js.map": "/mielofon/static/js/main.01034eb9.js.map"
+    "main.86237a96.js.map": "/mielofon/static/js/main.86237a96.js.map"
   },
   "entrypoints": [
     "static/css/main.5e0a8563.css",
-    "static/js/main.01034eb9.js"
+    "static/js/main.86237a96.js"
   ]
 }

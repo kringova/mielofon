@@ -60,35 +60,108 @@ const SimilarItems = ({ selectedSummary, similarItems, onRfcGenerated }) => {
     setLoading(true);
     setError(null);
 
-    // Используем моки для RFC
-    const rfcData = rfcMocks[selectedSummary.id] || {
-      title: `RFC for ${selectedSummary.title}`,
-      content: `Default RFC content for ${selectedSummary.title}`,
-      participants: selectedSummary.participants,
-      relatedItems: similarItems
-    };
+    try {
+      // Пытаемся найти мок по идентификатору
+      const summaryId = selectedSummary.id || `meeting${Math.floor(Math.random() * 3) + 1}`;
+      
+      // Используем моки для RFC или генерируем дефолтный контент
+      const rfcData = rfcMocks[summaryId] || {
+        title: `RFC: ${selectedSummary.title}`,
+        content: `
+# RFC: ${selectedSummary.title}
 
-    setTimeout(() => {
-      onRfcGenerated(rfcData);
+## Введение
+Документ описывает предложение по реализации "${selectedSummary.title}".
+
+## Предпосылки
+${selectedSummary.content || "Описание текущей ситуации и предпосылок для изменений."}
+
+## Предложение
+- Реализация новых функций
+- Оптимизация существующих процессов
+- Повышение качества разработки
+
+## Влияние
+- Улучшение пользовательского опыта
+- Повышение производительности системы
+- Упрощение поддержки и расширения функциональности
+
+## Временные рамки
+- Фаза 1: Исследование и планирование (2 недели)
+- Фаза 2: Разработка и тестирование (4 недели)
+- Фаза 3: Внедрение и мониторинг (2 недели)
+
+## Участники
+${selectedSummary.participants ? selectedSummary.participants.join(', ') : 'Не указаны'}
+
+## Связанные материалы
+${similarItems && similarItems.length > 0 ? similarItems.map(item => `- ${item.title || item}`).join('\n') : 'Нет связанных материалов'}
+        `,
+        participants: selectedSummary.participants || [],
+        relatedItems: similarItems || []
+      };
+
+      setTimeout(() => {
+        onRfcGenerated(rfcData);
+        setLoading(false);
+      }, 1000);
+    } catch (err) {
+      console.error("Error generating RFC:", err);
+      setError('Не удалось сгенерировать RFC. Попробуйте еще раз.');
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleGenerateDocumentation = () => {
     setLoading(true);
     setError(null);
 
-    // Мок данных для документации
-    const docData = {
-      title: selectedSummary.title,
-      content: `Documentation content for ${selectedSummary.title}`,
-      relatedItems: similarItems
-    };
+    try {
+      // Мок данных для документации
+      const docData = {
+        title: `Документация: ${selectedSummary.title}`,
+        content: `
+# Документация: ${selectedSummary.title}
 
-    setTimeout(() => {
-      onRfcGenerated(docData);
+## Общее описание
+${selectedSummary.content || "Документация содержит подробное описание функциональности и инструкции по использованию."}
+
+## Назначение системы
+Система предназначена для оптимизации процессов управления знаниями и повышения эффективности командной работы.
+
+## Функциональные требования
+1. Создание и хранение саммари встреч
+2. Анализ связанных материалов
+3. Генерация различных типов документации
+4. Интеграция с внешними системами
+
+## Технические требования
+- Frontend: React, Styled Components
+- Backend: Node.js, Express
+- База данных: MongoDB
+- Интеграции: REST API, GraphQL
+
+## Инструкция по использованию
+1. Создайте саммари в разделе "Создание саммари"
+2. Проанализируйте похожие материалы
+3. Сгенерируйте необходимую документацию
+4. Используйте инструменты анализа для улучшения качества
+
+## Связанные материалы
+${similarItems && similarItems.length > 0 ? similarItems.map(item => `- ${item.title || item}`).join('\n') : 'Нет связанных материалов'}
+        `,
+        relatedItems: similarItems || []
+      };
+
+      setTimeout(() => {
+        onRfcGenerated(docData);
+        setLoading(false);
+      }, 1000);
+    } catch (err) {
+      console.error("Error generating documentation:", err);
+      setError('Не удалось сгенерировать документацию. Попробуйте еще раз.');
       setLoading(false);
-    }, 1000);
+    }
   };
 
   // Отображение состояния загрузки
